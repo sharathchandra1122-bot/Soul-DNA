@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SoulDNA AI</title>
+
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: linear-gradient(to right, #0f172a, #1e293b);
+  color: white;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 34px;
+}
+
+p {
+  font-size: 18px;
+}
+
+button {
+  padding: 12px 18px;
+  margin: 8px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #16a34a;
+  transform: scale(1.05);
+}
+
+#result {
+  margin-top: 30px;
+  font-size: 22px;
+  font-weight: bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🧬 SoulDNA AI</h1>
+<p>Discover your hidden personality and unlock your true potential</p>
+
+<div id="quiz">
+
+<p>1. What drives you most?</p>
+<button onclick="answer('drive','ambition')">Ambition</button>
+<button onclick="answer('drive','comfort')">Comfort</button>
+
+<p>2. How do you make decisions?</p>
+<button onclick="answer('thinking','logic')">Logic</button>
+<button onclick="answer('thinking','emotion')">Emotion</button>
+
+<p>3. Your action style?</p>
+<button onclick="answer('action','fast')">Fast</button>
+<button onclick="answer('action','slow')">Slow</button>
+
+<p>4. Social energy?</p>
+<button onclick="answer('social','introvert')">Introvert</button>
+<button onclick="answer('social','extrovert')">Extrovert</button>
+
+<p>5. Risk level?</p>
+<button onclick="answer('risk','safe')">Safe</button>
+<button onclick="answer('risk','bold')">Bold</button>
+
+</div>
+
+<h2 id="result"></h2>
+
+<script>
+let dna = {};
+
+function answer(type, value) {
+  dna[type] = value;
+
+  if (Object.keys(dna).length === 5) {
+    showResult();
+  }
+}
+
+function showResult() {
+  let result = "";
+
+  if (dna.drive === "ambition" && dna.risk === "bold") {
+    result = "🔥 Strategic Rebel: You are fearless, driven, and built to lead. You chase growth and take bold risks.";
+  } 
+  else if (dna.thinking === "emotion") {
+    result = "💖 Emotional Visionary: You feel deeply and connect strongly. Your strength lies in empathy and creativity.";
+  } 
+  else if (dna.action === "slow") {
+    result = "🧠 Calm Architect: You think before you act. You build stable, long-term success.";
+  } 
+  else {
+    result = "⚡ Balanced Mind: You adapt quickly and maintain balance between logic and emotion.";
+  }
+
+  document.getElementById("result").innerText = result;
+}
+</script>
+
+</body>
+</html>
