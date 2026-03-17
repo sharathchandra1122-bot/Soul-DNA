@@ -72,7 +72,7 @@ button:hover {
 </div>
 
 <h2 id="result"></h2>
-
+<button onclick="shareResult()">Share Result</button>
 <script>
 let dna = {};
 
@@ -102,6 +102,19 @@ function showResult() {
 
   document.getElementById("result").innerText = result;
 }
+  function shareResult() {
+  let text = document.getElementById("result").innerText;
+
+  if (navigator.share) {
+    navigator.share({
+      title: "My SoulDNA Result",
+      text: text,
+      url: window.location.href
+    });
+  } else {
+    alert("Sharing not supported on this device");
+  }
+  }
 </script>
 
 </body>
