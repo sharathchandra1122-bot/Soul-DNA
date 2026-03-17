@@ -6,114 +6,240 @@
 <style>
 body {
   font-family: Arial;
-  text-align: center;
   background: linear-gradient(to right, #0f172a, #1e293b);
   color: white;
   padding: 20px;
-}
-
-h1 {
-  font-size: 34px;
-}
-
-p {
-  font-size: 18px;
+  text-align: center;
 }
 
 button {
-  padding: 12px 18px;
-  margin: 8px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 8px;
   border: none;
-  border-radius: 10px;
   background: #22c55e;
-  color: black;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-button:hover {
-  background: #16a34a;
-  transform: scale(1.05);
+#premium, #payment {
+  display:none;
+  margin-top:20px;
+  text-align:left;
+  border:1px solid #22c55e;
+  padding:20px;
 }
 
-#result {
-  margin-top: 30px;
-  font-size: 22px;
-  font-weight: bold;
+img {
+  width: 200px;
+  margin-top: 10px;
+}
+
+#progress {
+  margin-bottom: 15px;
 }
 </style>
-
 </head>
 
 <body>
+
 <h1>🧬 SoulDNA AI</h1>
 <p><b>You’re not who you think you are…</b></p>
-<p>Take this test and discover your true personality</p>
-<button onclick="answer('drive','ambition')">Ambition</button>
-<button onclick="answer('drive','comfort')">Comfort</button>
 
-<p>2. How do you make decisions?</p>
-<button onclick="answer('thinking','logic')">Logic</button>
-<button onclick="answer('thinking','emotion')">Emotion</button>
-
-<p>3. Your action style?</p>
-<button onclick="answer('action','fast')">Fast</button>
-<button onclick="answer('action','slow')">Slow</button>
-
-<p>4. Social energy?</p>
-<button onclick="answer('social','introvert')">Introvert</button>
-<button onclick="answer('social','extrovert')">Extrovert</button>
-
-<p>5. Risk level?</p>
-<button onclick="answer('risk','safe')">Safe</button>
-<button onclick="answer('risk','bold')">Bold</button>
-
-</div>
+<div id="progress"></div>
+<div id="question"></div>
+<div id="options"></div>
 
 <h2 id="result"></h2>
-<button id="shareBtn" onclick="shareResult()" style="display:none;">Share Result</button>
+
+<button id="unlockBtn" onclick="showPayment()">Unlock Full Report ₹199</button>
+
+<div id="payment">
+<h3>💰 Pay ₹199 to Unlock Full Report</h3>
+<p>Scan the QR below and complete payment</p>
+
+<img src="qr.png">
+
+<br>
+<button onclick="unlock()">I Have Paid</button>
+</div>
+
+<div id="premium"></div>
+
 <script>
-let dna = {};
 
-function answer(type, value) {
-  dna[type] = value;
+let qIndex = 0;
+let score = {love:0, skill:0, purpose:0, money:0, mind:0};
 
-  if (Object.keys(dna).length === 5) {
-    showResult();
-  }
+const questions = [
+["What excites you most?","Creating","Helping","Earning"],
+["Your strength?","Skill","Thinking","People"],
+["Your goal?","Impact","Money","Freedom"],
+["Your mindset?","Logic","Emotion","Balanced"],
+["Your action style?","Fast","Slow","Adaptive"]
+];
+
+function loadQ(){
+if(qIndex>=questions.length){
+showResult();
+return;
 }
 
-function showResult() {
-  let result = "";
+document.getElementById("progress").innerText = 
+"Question " + (qIndex+1) + "/5";
 
-  if (dna.drive === "ambition" && dna.risk === "bold") {
-    result = "🔥 Strategic Rebel: You are fearless, driven, and built to lead. You chase growth and take bold risks.";
-  } 
-  else if (dna.thinking === "emotion") {
-    result = "💖 Emotional Visionary: You feel deeply and connect strongly. Your strength lies in empathy and creativity.";
-  } 
-  else if (dna.action === "slow") {
-    result = "🧠 Calm Architect: You think before you act. You build stable, long-term success.";
-  } 
-  else {
-    result = "⚡ Balanced Mind: You adapt quickly and maintain balance between logic and emotion.";
-  }
+document.getElementById("question").innerText = questions[qIndex][0];
 
-  document.getElementById("result").innerText = result;
+let html="";
+for(let i=1;i<=3;i++){
+html += `<button onclick="answer(${i})">${questions[qIndex][i]}</button>`;
 }
-  function shareResult() {
-  let text = document.getElementById("shareBtn").style.display = "inline-block";
-  if (navigator.share) {
-    navigator.share({
-      title: "My SoulDNA Result",
-      text: text,
-      url: window.location.href
-    });
-  } else {
-    alert("Sharing not supported on this device");
-  }
-  }
+document.getElementById("options").innerHTML = html;
+}
+
+function answer(choice){
+
+if(qIndex==0) score.love+=choice;
+if(qIndex==1) score.skill+=choice;
+if(qIndex==2) score.purpose+=choice;
+if(qIndex==3) score.mind+=choice;
+if(qIndex==4) score.money+=choice;
+
+qIndex++;
+loadQ();
+}
+
+function showResult(){
+
+let archetype, desc, career;
+
+if(score.purpose > score.money){
+archetype="🌍 Visionary Creator";
+desc="You are driven by purpose, meaning, and impact.";
+career="Creative fields, startups, influence";
+}
+else if(score.money > score.purpose){
+archetype="💰 Strategic Operator";
+desc="You focus on growth, leverage, and financial success.";
+career="Business, trading, scaling ventures";
+}
+else if(score.skill > score.love){
+archetype="🧠 Analytical Architect";
+desc="You think deeply and build structured systems.";
+career="Tech, engineering, strategy";
+}
+else{
+archetype="🔥 Hybrid Leader";
+desc="You balance logic, emotion, and ambition.";
+career="Leadership, entrepreneurship";
+}
+
+document.getElementById("question").style.display="none";
+document.getElementById("options").style.display="none";
+document.getElementById("progress").style.display="none";
+
+document.getElementById("result").innerHTML =
+`<b>${archetype}</b><br>${desc}<br><i>${career}</i>`;
+}
+
+function showPayment(){
+document.getElementById("payment").style.display="block";
+}
+
+function unlock(){
+
+let type = "";
+
+if(score.purpose > score.money){ type="creator"; }
+else if(score.money > score.purpose){ type="money"; }
+else if(score.skill > score.love){ type="analyst"; }
+else{ type="hybrid"; }
+
+let energy, strength, income, purpose, blind;
+let careers, skills, roadmap, scaling;
+
+if(type==="creator"){
+energy="Emotion-driven, purpose-led energy";
+strength="Creativity + empathy";
+income="Audience-based income";
+purpose="Impact";
+blind="Overthinking";
+careers="Creator, Coach, Designer, Influencer, Educator";
+skills="Storytelling + Branding";
+roadmap="Build → Audience → Monetize → Scale";
+scaling="Audience → Product";
+}
+else if(type==="money"){
+energy="Fast-paced, high-performance energy";
+strength="Execution + decision-making";
+income="Scalable wealth systems";
+purpose="Growth";
+blind="Burnout";
+careers="Entrepreneur, Trader, Marketer, Consultant, Sales";
+skills="Sales + Marketing";
+roadmap="Learn → Sell → Scale → Automate";
+scaling="Skill → System → Scale";
+}
+else if(type==="analyst"){
+energy="Calm, deep thinking";
+strength="Logic + systems";
+income="Skill-based income";
+purpose="Mastery";
+blind="Over-analysis";
+careers="Engineer, Developer, Analyst, Strategist, Architect";
+skills="Technical + problem solving";
+roadmap="Learn → Build → Optimize → Master";
+scaling="Skill → Expertise";
+}
+else{
+energy="Balanced adaptive energy";
+strength="Versatility";
+income="Hybrid income streams";
+purpose="Freedom";
+blind="Lack of focus";
+careers="Founder, Manager, Consultant, Creator, Operator";
+skills="Leadership + adaptability";
+roadmap="Explore → Focus → Execute → Scale";
+scaling="Multi-skill → Growth";
+}
+
+let premiumHTML = `
+<h3>🧬 Identity Breakdown</h3>
+<p><b>Energy:</b> ${energy}</p>
+<p><b>Strength:</b> ${strength}</p>
+<p><b>Income Pattern:</b> ${income}</p>
+<p><b>Purpose:</b> ${purpose}</p>
+<p><b>Blind Spots:</b> ${blind}</p>
+
+<h3>💼 Career Strategy</h3>
+<p>${careers}</p>
+<p>${skills}</p>
+<p>${roadmap}</p>
+<p>${scaling}</p>
+
+<h3>💰 Income Blueprint</h3>
+<p>Learn: ${skills}</p>
+<p>Avoid: Low leverage work</p>
+<p>Monetize: Skills + digital platforms</p>
+<p>AI-proof: Build human advantage</p>
+
+<h3>⚠️ Risk Map</h3>
+<p>${blind}</p>
+<p>Burnout risk present</p>
+
+<h3>🚀 Action Plan</h3>
+<p>30 Days: ${roadmap.split("→")[0]}</p>
+<p>90 Days: ${roadmap.split("→")[1]}</p>
+<p>1 Year: ${roadmap.split("→")[3] || roadmap}</p>
+`;
+
+document.getElementById("premium").style.display="block";
+document.getElementById("premium").innerHTML = premiumHTML;
+
+}
+
+loadQ();
+
 </script>
 
 </body>
