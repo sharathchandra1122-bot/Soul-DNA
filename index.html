@@ -6,38 +6,23 @@
 <style>
 body {
   font-family: Arial;
-  background: linear-gradient(to right, #0f172a, #1e293b);
+  background: #0f172a;
   color: white;
   padding: 20px;
   text-align: center;
 }
 
 button {
-  padding: 10px;
-  margin: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  margin: 8px;
+  border-radius: 10px;
   border: none;
   background: #22c55e;
   font-weight: bold;
-  cursor: pointer;
 }
 
-#premium, #payment {
-  display:none;
-  margin-top:20px;
-  text-align:left;
-  border:1px solid #22c55e;
-  padding:20px;
-}
-
-img {
-  width: 200px;
-  margin-top: 10px;
-}
-
-#progress {
-  margin-bottom: 15px;
-}
+#premium, #payment { display:none; margin-top:20px; text-align:left; }
+#loader { display:none; }
 </style>
 </head>
 
@@ -50,16 +35,15 @@ img {
 <div id="question"></div>
 <div id="options"></div>
 
+<div id="loader">🧠 Analyzing your personality deeply...</div>
+
 <h2 id="result"></h2>
 
-<button id="unlockBtn" onclick="showPayment()">Unlock Full Report ₹199</button>
+<button onclick="showPayment()">Unlock Full Report ₹199</button>
 
 <div id="payment">
-<h3>💰 Pay ₹199 to Unlock Full Report</h3>
-<p>Scan the QR below and complete payment</p>
-
+<h3>Pay ₹199</h3>
 <img src="qr.png.jpg">
-
 <br>
 <button onclick="unlock()">I Have Paid</button>
 </div>
@@ -68,26 +52,92 @@ img {
 
 <script>
 
-let qIndex = 0;
+// ---------------- SCORE ----------------
 let score = {love:0, skill:0, purpose:0, money:0, mind:0};
+let qIndex = 0;
 
+// ---------------- 60 QUESTIONS ----------------
 const questions = [
-["What excites you most?","Creating","Helping","Earning"],
-["Your strength?","Skill","Thinking","People"],
-["Your goal?","Impact","Money","Freedom"],
-["Your mindset?","Logic","Emotion","Balanced"],
-["Your action style?","Fast","Slow","Adaptive"]
+
+/* PASSION */
+["What excites you most?","Creating","Helping","Winning"],
+["What do you enjoy doing alone?","Thinking","Creating","Planning"],
+["What gives you energy?","Ideas","People","Success"],
+["What makes you lose time?","Work","Creativity","Thinking"],
+["Your favorite topic?","Business","Psychology","Tech"],
+["You love solving?","Problems","Emotions","Systems"],
+["You enjoy?","Leading","Learning","Expressing"],
+["Your joy comes from?","Growth","Connection","Freedom"],
+["You prefer?","Impact","Money","Peace"],
+["You feel alive when?","Building","Winning","Helping"],
+["Your interest leans?","Creative","Logical","Social"],
+["You chase?","Meaning","Money","Recognition"],
+
+/* SKILL */
+["You are best at?","Thinking","Doing","Talking"],
+["You learn fastest by?","Practice","Observation","Experiment"],
+["People admire your?","Skill","Energy","Ideas"],
+["You excel in?","Execution","Strategy","Creativity"],
+["You perform best?","Alone","Team","Public"],
+["You solve problems?","Logic","Emotion","Action"],
+["Your edge?","Discipline","Creativity","Confidence"],
+["Your strongest trait?","Focus","Speed","Vision"],
+["You prefer?","Depth","Speed","Flexibility"],
+["Your thinking is?","Deep","Fast","Balanced"],
+["You handle complexity?","Well","Average","Avoid"],
+["Your talent is?","Analysis","Communication","Execution"],
+
+/* PURPOSE */
+["You care about?","People","Money","Self"],
+["You want to impact?","Society","Yourself","World"],
+["Your purpose?","Serve","Lead","Build"],
+["You feel bad about?","Injustice","Failure","Loss"],
+["You want to fix?","Systems","People","Your life"],
+["Your mission?","Growth","Impact","Power"],
+["You help others by?","Advice","Action","Support"],
+["You want to leave?","Legacy","Wealth","Freedom"],
+["Your drive?","Meaning","Money","Recognition"],
+["You fight for?","Truth","Power","Peace"],
+["You value?","Impact","Security","Freedom"],
+["You want to be known for?","Success","Kindness","Power"],
+
+/* MONEY */
+["You want income?","Stable","Scalable","Fast"],
+["You prefer?","Salary","Business","Investing"],
+["You like risk?","Low","Medium","High"],
+["You focus on?","Savings","Growth","Freedom"],
+["You want?","Security","Wealth","Independence"],
+["You work for?","Money","Passion","Impact"],
+["You invest in?","Safe","Growth","Ideas"],
+["You like?","Control","Leverage","Freedom"],
+["You think money is?","Tool","Power","Freedom"],
+["Your goal?","Comfort","Rich","Unlimited"],
+["You spend?","Carefully","Boldly","Smart"],
+["You prefer income?","Active","Passive","Hybrid"],
+
+/* PSYCHOLOGY */
+["Under stress?","Think","Act","Freeze"],
+["Decision style?","Logic","Emotion","Mix"],
+["You are?","Introvert","Extrovert","Ambivert"],
+["You prefer?","Plan","Flow","Adapt"],
+["Risk level?","Safe","Balanced","Bold"],
+["You trust?","Data","Gut","Both"],
+["Failure?","Retry","Pause","Quit"],
+["Driven by?","Fear","Ambition","Purpose"],
+["You like?","Control","Freedom","Balance"],
+["You value?","Peace","Success","Happiness"],
+["You overthink?","Yes","No","Sometimes"],
+["Your mindset?","Fixed","Growth","Adaptive"]
+
 ];
 
+// ---------------- LOAD ----------------
 function loadQ(){
-if(qIndex>=questions.length){
-showResult();
-return;
-}
+if(qIndex>=60){ showLoader(); return; }
 
-document.getElementById("progress").innerText = 
-"Question " + (qIndex+1) + "/5";
+let section = qIndex<12?"Passion":qIndex<24?"Skill":qIndex<36?"Purpose":qIndex<48?"Money":"Psychology";
 
+document.getElementById("progress").innerText = section+" "+(qIndex+1)+"/60";
 document.getElementById("question").innerText = questions[qIndex][0];
 
 let html="";
@@ -97,150 +147,85 @@ html += `<button onclick="answer(${i})">${questions[qIndex][i]}</button>`;
 document.getElementById("options").innerHTML = html;
 }
 
-function answer(choice){
+// ---------------- ANSWER ----------------
+function answer(c){
+if(qIndex<12) score.love+=c;
+else if(qIndex<24) score.skill+=c;
+else if(qIndex<36) score.purpose+=c;
+else if(qIndex<48) score.money+=c;
+else score.mind+=c;
 
-if(qIndex==0) score.love+=choice;
-if(qIndex==1) score.skill+=choice;
-if(qIndex==2) score.purpose+=choice;
-if(qIndex==3) score.mind+=choice;
-if(qIndex==4) score.money+=choice;
-
-qIndex++;
-loadQ();
+qIndex++; loadQ();
 }
 
-function showResult(){
-
-let archetype, desc, career;
-
-if(score.purpose > score.money){
-archetype="🌍 Visionary Creator";
-desc="You are driven by purpose, meaning, and impact.";
-career="Creative fields, startups, influence";
-}
-else if(score.money > score.purpose){
-archetype="💰 Strategic Operator";
-desc="You focus on growth, leverage, and financial success.";
-career="Business, trading, scaling ventures";
-}
-else if(score.skill > score.love){
-archetype="🧠 Analytical Architect";
-desc="You think deeply and build structured systems.";
-career="Tech, engineering, strategy";
-}
-else{
-archetype="🔥 Hybrid Leader";
-desc="You balance logic, emotion, and ambition.";
-career="Leadership, entrepreneurship";
-}
-
+// ---------------- LOADER ----------------
+function showLoader(){
 document.getElementById("question").style.display="none";
 document.getElementById("options").style.display="none";
 document.getElementById("progress").style.display="none";
+document.getElementById("loader").style.display="block";
 
-document.getElementById("result").innerHTML =
-`<b>${archetype}</b><br>${desc}<br><i>${career}</i>`;
+setTimeout(showResult,2500);
 }
 
+// ---------------- RESULT ----------------
+function showResult(){
+
+let entries = Object.entries(score).sort((a,b)=>b[1]-a[1]);
+let primary = entries[0][0];
+let secondary = entries[1][0];
+
+let text = "";
+
+if(primary==="purpose"){
+text="You are someone who cannot live a shallow life. You need meaning. Even when you chase success, a part of you keeps asking — 'Why am I doing this?' That question defines you.";
+}
+else if(primary==="money"){
+text="You are naturally wired to grow, scale, and expand. You don’t just work — you calculate leverage. You see opportunities where others see effort.";
+}
+else if(primary==="skill"){
+text="You are a builder. You don’t talk much about success — you build systems that create it. Your strength lies in precision and depth.";
+}
+else{
+text="You are complex. You adapt. You shift. You don’t fit into one box — and that is your biggest strength.";
+}
+
+document.getElementById("loader").style.display="none";
+
+document.getElementById("result").innerHTML =
+`<b>${primary.toUpperCase()} TYPE</b><br><br>${text}`;
+}
+
+// ---------------- PAYMENT ----------------
 function showPayment(){
 document.getElementById("payment").style.display="block";
 }
 
+// ---------------- PREMIUM ----------------
 function unlock(){
 
-let type = "";
+document.getElementById("premium").style.display="block";
 
-if(score.purpose > score.money){ type="creator"; }
-else if(score.money > score.purpose){ type="money"; }
-else if(score.skill > score.love){ type="analyst"; }
-else{ type="hybrid"; }
-
-let energy, strength, income, purpose, blind;
-let careers, skills, roadmap, scaling;
-
-if(type==="creator"){
-energy="Emotion-driven, purpose-led energy";
-strength="Creativity + empathy";
-income="Audience-based income";
-purpose="Impact";
-blind="Overthinking";
-careers="Creator, Coach, Designer, Influencer, Educator";
-skills="Storytelling + Branding";
-roadmap="Build → Audience → Monetize → Scale";
-scaling="Audience → Product";
-}
-else if(type==="money"){
-energy="Fast-paced, high-performance energy";
-strength="Execution + decision-making";
-income="Scalable wealth systems";
-purpose="Growth";
-blind="Burnout";
-careers="Entrepreneur, Trader, Marketer, Consultant, Sales";
-skills="Sales + Marketing";
-roadmap="Learn → Sell → Scale → Automate";
-scaling="Skill → System → Scale";
-}
-else if(type==="analyst"){
-energy="Calm, deep thinking";
-strength="Logic + systems";
-income="Skill-based income";
-purpose="Mastery";
-blind="Over-analysis";
-careers="Engineer, Developer, Analyst, Strategist, Architect";
-skills="Technical + problem solving";
-roadmap="Learn → Build → Optimize → Master";
-scaling="Skill → Expertise";
-}
-else{
-energy="Balanced adaptive energy";
-strength="Versatility";
-income="Hybrid income streams";
-purpose="Freedom";
-blind="Lack of focus";
-careers="Founder, Manager, Consultant, Creator, Operator";
-skills="Leadership + adaptability";
-roadmap="Explore → Focus → Execute → Scale";
-scaling="Multi-skill → Growth";
-}
-
-let premiumHTML = `
+document.getElementById("premium").innerHTML = `
 <h3>🧬 Identity Breakdown</h3>
-<p><b>Energy:</b> ${energy}</p>
-<p><b>Strength:</b> ${strength}</p>
-<p><b>Income Pattern:</b> ${income}</p>
-<p><b>Purpose:</b> ${purpose}</p>
-<p><b>Blind Spots:</b> ${blind}</p>
+<p>Your internal patterns reveal how you think, act, and earn.</p>
 
 <h3>💼 Career Strategy</h3>
-<p>${careers}</p>
-<p>${skills}</p>
-<p>${roadmap}</p>
-<p>${scaling}</p>
+<p>Your best paths align with your dominant traits.</p>
 
 <h3>💰 Income Blueprint</h3>
-<p>Learn: ${skills}</p>
-<p>Avoid: Low leverage work</p>
-<p>Monetize: Skills + digital platforms</p>
-<p>AI-proof: Build human advantage</p>
+<p>You are suited for scalable and leverage-based income.</p>
 
 <h3>⚠️ Risk Map</h3>
-<p>${blind}</p>
-<p>Burnout risk present</p>
+<p>Your biggest risk is internal conflict and inconsistency.</p>
 
 <h3>🚀 Action Plan</h3>
-<p>30 Days: ${roadmap.split("→")[0]}</p>
-<p>90 Days: ${roadmap.split("→")[1]}</p>
-<p>1 Year: ${roadmap.split("→")[3] || roadmap}</p>
+<p>30 Days: Build skill<br>90 Days: Start income<br>1 Year: Scale</p>
 `;
-
-document.getElementById("premium").style.display="block";
-document.getElementById("premium").innerHTML = premiumHTML;
-
 }
 
 loadQ();
 
 </script>
-
 </body>
 </html>
