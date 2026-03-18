@@ -111,24 +111,79 @@ button:hover {transform:scale(1.05);}
 let score = {love:0, skill:0, purpose:0, money:0, mind:0};
 let qIndex = 0;
 
-const questions = Array.from({length:60},(_,i)=>[
-`Question ${i+1}: What drives you most?`,
-"Creating","Helping","Winning"
-]);
+const questions = [
 
-function startTest(){
-landing.classList.add("hidden");
-quiz.classList.remove("hidden");
-loadQ();
-}
+/* PASSION */
+["What excites you most?","Creating","Helping","Winning"],
+["What do you enjoy doing alone?","Thinking","Creating","Planning"],
+["What gives you energy?","Ideas","People","Success"],
+["What makes you lose time?","Work","Creativity","Thinking"],
+["Your favorite topic?","Business","Psychology","Tech"],
+["You love solving?","Problems","Emotions","Systems"],
+["You enjoy?","Leading","Learning","Expressing"],
+["Your joy comes from?","Growth","Connection","Freedom"],
+["You prefer?","Impact","Money","Peace"],
+["You feel alive when?","Building","Winning","Helping"],
+["Your interest leans?","Creative","Logical","Social"],
+["You chase?","Meaning","Money","Recognition"],
 
-function loadQ(){
-if(qIndex>=60){ showLoader(); return; }
+/* SKILL */
+["You are best at?","Thinking","Doing","Talking"],
+["You learn fastest by?","Practice","Observation","Experiment"],
+["People admire your?","Skill","Energy","Ideas"],
+["You excel in?","Execution","Strategy","Creativity"],
+["You perform best?","Alone","Team","Public"],
+["You solve problems?","Logic","Emotion","Action"],
+["Your edge?","Discipline","Creativity","Confidence"],
+["Your strongest trait?","Focus","Speed","Vision"],
+["You prefer?","Depth","Speed","Flexibility"],
+["Your thinking is?","Deep","Fast","Balanced"],
+["You handle complexity?","Well","Average","Avoid"],
+["Your talent is?","Analysis","Communication","Execution"],
 
-let section = qIndex<12?"Passion":qIndex<24?"Skill":qIndex<36?"Purpose":qIndex<48?"Money":"Psychology";
+/* PURPOSE */
+["You care about?","People","Money","Self"],
+["You want to impact?","Society","Yourself","World"],
+["Your purpose?","Serve","Lead","Build"],
+["You feel bad about?","Injustice","Failure","Loss"],
+["You want to fix?","Systems","People","Your life"],
+["Your mission?","Growth","Impact","Power"],
+["You help others by?","Advice","Action","Support"],
+["You want to leave?","Legacy","Wealth","Freedom"],
+["Your drive?","Meaning","Money","Recognition"],
+["You fight for?","Truth","Power","Peace"],
+["You value?","Impact","Security","Freedom"],
+["You want to be known for?","Success","Kindness","Power"],
 
-progress.innerText = section+" "+(qIndex+1)+"/60";
-question.innerText = questions[qIndex][0];
+/* MONEY */
+["You want income?","Stable","Scalable","Fast"],
+["You prefer?","Salary","Business","Investing"],
+["You like risk?","Low","Medium","High"],
+["You focus on?","Savings","Growth","Freedom"],
+["You want?","Security","Wealth","Independence"],
+["You work for?","Money","Passion","Impact"],
+["You invest in?","Safe","Growth","Ideas"],
+["You like?","Control","Leverage","Freedom"],
+["You think money is?","Tool","Power","Freedom"],
+["Your goal?","Comfort","Rich","Unlimited"],
+["You spend?","Carefully","Boldly","Smart"],
+["You prefer income?","Active","Passive","Hybrid"],
+
+/* PSYCHOLOGY */
+["Under stress?","Think","Act","Freeze"],
+["Decision style?","Logic","Emotion","Mix"],
+["You are?","Introvert","Extrovert","Ambivert"],
+["You prefer?","Plan","Flow","Adapt"],
+["Risk level?","Safe","Balanced","Bold"],
+["You trust?","Data","Gut","Both"],
+["Failure?","Retry","Pause","Quit"],
+["Driven by?","Fear","Ambition","Purpose"],
+["You like?","Control","Freedom","Balance"],
+["You value?","Peace","Success","Happiness"],
+["You overthink?","Yes","No","Sometimes"],
+["Your mindset?","Fixed","Growth","Adaptive"]
+
+];
 
 fill.style.width = ((qIndex/60)*100)+"%";
 
@@ -143,6 +198,64 @@ function answer(c){
 if(qIndex<12) score.love+=c;
 else if(qIndex<24) score.skill+=c;
 else if(qIndex<36) score.purpose+=c;
+else if(qIndex<48) score.money+=c;
+else score.mind+=c;
+
+qIndex++;
+loadQ();
+}
+
+function showLoader(){
+quiz.classList.add("hidden");
+loader.classList.remove("hidden");
+setTimeout(showPreview,2000);
+}
+
+function showPreview(){
+loader.classList.add("hidden");
+preview.classList.remove("hidden");
+previewText.innerText="Your answers show a powerful hidden personality pattern that most people never discover.";
+}
+
+function showPayment(){
+preview.classList.add("hidden");
+payment.classList.remove("hidden");
+}
+
+function unlock(){
+payment.classList.add("hidden");
+resultPage.classList.remove("hidden");
+
+let entries = Object.entries(score).sort((a,b)=>b[1]-a[1]);
+let primary = entries[0][0];
+
+let text = `
+<h3>${primary.toUpperCase()} TYPE</h3>
+<p>You are not ordinary. Your decisions are shaped by deeper layers most people never access.</p>
+
+<h3>🧬 Hidden Strength</h3>
+<p>You operate on instinct + intelligence. That combination is rare.</p>
+
+<h3>💰 Income Path</h3>
+<p>Your best success comes from leverage, not effort.</p>
+
+<h3>⚠️ Blind Spot</h3>
+<p>Your biggest risk is inconsistency and self-doubt.</p>
+
+<h3>🚀 Future Prediction</h3>
+<p>If focused, you can reach a level most people only dream of.</p>
+`;
+
+finalResult.innerHTML = text;
+}
+
+function share(){
+let text = "I just discovered my hidden personality using SoulDNA AI 🔥";
+navigator.clipboard.writeText(text);
+alert("Copied! Share it 🚀");
+}
+</script></body>
+</html>else if(qIndex<36) score.purpose+=c;
 else if(qIndex<48) score.money+=c;
 else score.mind+=c;
 
